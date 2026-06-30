@@ -129,7 +129,7 @@
                     <div class="col-lg-8">
                         <h3 class="mb-2">Send us a message</h3>
                         <p class="mb-4">Have questions about our self-drive car rentals? Need help choosing the right vehicle or checking availability? Our team is here to assist you with bookings, pricing, rental policies, and any travel-related queries. Fill out the form below, call us, or send us a WhatsApp message—we'll get back to you as soon as possible.</p>
-                        <form>
+                        <form id="tirunelvelirentalcarscontact" action="https://formspree.io/f/mqevdwkl"  method="POST">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating">
@@ -157,6 +157,9 @@
                                 </div>
                                 <div class="col-12">
                                     <button class="btn btn-primary w-100 py-3" type="submit">Send Message</button>
+                                </div>
+                                <div class="col-12">
+                                    <p id="tirunelvelirentalcarscontact-form-status"></p>
                                 </div>
                             </div>
                         </form>
@@ -254,6 +257,41 @@
 
         <!-- Template Javascript -->
         <script src="js/main.js"></script>
+        <script>
+        var form = document.getElementById("tirunelvelirentalcarscontact");
+        
+        async function handleSubmit(event) {
+            event.preventDefault();
+            // Set reply-to dynamically
+            const userEmail = form.querySelector('input[name="email"]').value;
+            form.querySelector('input[name="_replyto"]').value = userEmail;
+            var status = document.getElementById("tirunelvelirentalcarscontact-form-status");
+            var data = new FormData(event.target);
+            fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: {
+                'Accept': 'application/json'
+            }
+            }).then(response => {
+            if (response.ok) {
+                status.innerHTML = "Thanks for your submission! We will get in touch with you";
+                form.reset()
+            } else {
+                response.json().then(data => {
+                if (Object.hasOwn(data, 'errors')) {
+                    status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+                } else {
+                    status.innerHTML = "Oops! There was a problem submitting your form"
+                }
+                })
+            }
+            }).catch(error => {
+            status.innerHTML = "Oops! There was a problem submitting your form"
+            });
+        }
+        form.addEventListener("submit", handleSubmit)
+    </script>
     </body>
 
 </html>
